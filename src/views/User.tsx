@@ -43,6 +43,7 @@ function UserView() {
   const { id } = useParams();
 
   const users = useSelector((state: RootState) => state.users);
+  const mode = useSelector((state: RootState) => state.mode);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -54,6 +55,17 @@ function UserView() {
   const handleDeleteUser = () => {
     dispatch(deleteUser(Number(id)));
     navigate("/");
+    const notification: NotificationCard = {
+      msg: "User deleted.",
+      type: "success",
+      id: Date.now().toString(),
+    };
+
+    dispatch(addNotification(notification));
+
+    setTimeout(() => {
+      dispatch(removeNotification(notification.id));
+    }, 5000);
   };
 
   const {
@@ -138,23 +150,23 @@ function UserView() {
           <ButtonGroup>
             <Button
               onClick={() => setEditUserModal(true)}
-              style={{ backgroundColor: "blue" }}
+              style={{ backgroundColor: "#0288d1" }}
             >
               <FontAwesomeIcon icon={faPen} />
-              <Label>Edit</Label>
+              <Label sx={{color: 'white'}}>Edit</Label>
             </Button>
             <Button
               onClick={() => setDeleteModal(true)}
               style={{ backgroundColor: "red" }}
             >
               <FontAwesomeIcon icon={faTrash} />
-              <Label>Delete</Label>
+              <Label sx={{color: 'white'}}>Delete</Label>
             </Button>
           </ButtonGroup>
         </LeftSection>
         <RightSection>
           <Card>
-            <FontAwesomeIcon icon={faGlobe} color="white" />
+            <FontAwesomeIcon icon={faGlobe} color={mode === 'light' ? 'black' : 'white'} />
             <Label>Website</Label>
             <Label sx={{ color: "gray", marginLeft: "auto" }}>
               {user?.website}
@@ -163,7 +175,7 @@ function UserView() {
 
           <Card flexDirection="column">
             <CardHeader>
-              <FontAwesomeIcon icon={faBriefcase} color="white" />
+              <FontAwesomeIcon icon={faBriefcase} color={mode === 'light' ? 'black' : 'white'} />
               <Label>Company</Label>
             </CardHeader>
             <Divider />
@@ -189,7 +201,7 @@ function UserView() {
 
           <Card flexDirection="column">
             <CardDetailRow>
-              <FontAwesomeIcon icon={faLocationDot} color="white" />
+              <FontAwesomeIcon icon={faLocationDot} color={mode === 'light' ? 'black' : 'white'} />
               <Label>Address</Label>
             </CardDetailRow>
             <Divider />
@@ -230,8 +242,8 @@ function UserView() {
         </Modal>
       )}
       {editUserModal && (
-        <Modal onClose={() => setEditUserModal(true)}>
-          <Label>Add New User</Label>
+        <Modal onClose={() => setEditUserModal(false)}>
+          <Label>Edit User</Label>
           <FormContainer onSubmit={handleSubmit(onSubmit)}>
             <FormField>
               <Label>Name</Label>
@@ -341,7 +353,7 @@ function UserView() {
               <Input {...register("company.bs")} />
             </FormField>
 
-            <SubmitButton type="submit">Edit User</SubmitButton>
+            <SubmitButton type="submit">Update User</SubmitButton>
           </FormContainer>
         </Modal>
       )}
@@ -368,7 +380,7 @@ const Avatar = styled.img`
   border-radius: 50%;
   width: 15rem;
   height: 15rem;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadow};
 `;
 
 const UserInfo = styled.div`
@@ -402,7 +414,7 @@ const Button = styled.div`
   border-radius: 10px;
   color: white;
   cursor: pointer;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadow};
 `;
 
 const RightSection = styled.div`
@@ -419,7 +431,7 @@ const Card = styled.div<{ flexDirection?: string }>`
   width: 50%;
   padding: 1rem;
   border-radius: 10px;
-  background-color: #2d2d30;
+  background-color: ${(p) => p.theme.secondary};
   gap: 1rem;
   display: flex;
   align-items: center;
@@ -435,7 +447,7 @@ const CardHeader = styled.div`
 
 const Divider = styled.div`
   width: 100%;
-  background: #3e3e42;
+  background: ${(p) => p.theme.primary};
   height: 1px;
 `;
 

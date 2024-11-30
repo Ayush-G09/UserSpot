@@ -22,5 +22,7 @@ export const generateTheme = (mode: Mode) => ({
     primary: mode === 'light' ? lightMode.primary : darkMode.primary,
     secondary: mode === 'light' ? lightMode.secondary : darkMode.secondary,
     tertiary: mode === 'light' ? lightMode.tertiary : darkMode.tertiary,
+    shadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.3)',
+    shadowInset: 'inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3)',
 });
   

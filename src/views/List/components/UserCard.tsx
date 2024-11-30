@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { User } from "../../../types";
+import { NotificationCard, User } from "../../../types";
 import {
   faEllipsisVertical,
   faArrowUpRightFromSquare,
@@ -11,7 +11,11 @@ import Label from "../../../components/Label";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
-import { deleteUser } from "../../../store/action";
+import {
+  addNotification,
+  deleteUser,
+  removeNotification,
+} from "../../../store/action";
 import Modal from "../../../components/Modal";
 
 type Props = {
@@ -60,6 +64,17 @@ function UserCard({ user }: Props) {
   const handleDeleteUser = () => {
     dispatch(deleteUser(user.id));
     setDeleteModal(false);
+    const notification: NotificationCard = {
+      msg: "User deleted.",
+      type: "success",
+      id: Date.now().toString(),
+    };
+
+    dispatch(addNotification(notification));
+
+    setTimeout(() => {
+      dispatch(removeNotification(notification.id));
+    }, 5000);
   };
 
   return (
@@ -100,7 +115,7 @@ function UserCard({ user }: Props) {
               <FontAwesomeIcon
                 onClick={() => navigate(`/user/${user.id}`)}
                 size="xs"
-                color="blue"
+                color="#0288d1"
                 icon={faArrowUpRightFromSquare}
               />
             </div>
@@ -194,7 +209,7 @@ const ToolContainer = styled.div<{ mode: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ mode }) => (mode === "light" ? "black" : "white")};
+  color: ${(p) => p.theme.font};
   cursor: pointer;
 `;
 
@@ -206,8 +221,8 @@ const Tooltip = styled.div`
   padding: 0rem 0.5rem;
   display: flex;
   border-radius: 5px;
-  background-color: #fafafa;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  background-color: ${(p) => p.theme.primary};
+  box-shadow: ${(p) => p.theme.shadow};
   top: -40%;
   right: 80%;
   z-index: 10;
@@ -223,7 +238,7 @@ const ModalButton = styled.div<{ bgColor: string }>`
   background: ${({ bgColor }) => bgColor};
   color: white;
   border-radius: 10px;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadow};
 `;
 
 export default UserCard;

@@ -78,7 +78,7 @@ const Card = styled.div<{ type: "error" | "success" }>`
   min-width: 10%;
   background-color: ${(p) => (p.type === "error" ? "#f8c0bf" : "#C4EC94")};
   border-radius: 10px;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadow};
   padding: 0.5rem;
   color: ${(p) => (p.type === "error" ? "#a7222f" : "#4F7A11")};
   border: 1px solid ${(p) => (p.type === "error" ? "#a7222f" : "#4F7A11")};

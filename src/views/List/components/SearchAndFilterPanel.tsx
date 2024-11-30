@@ -6,13 +6,17 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import Label from "../../../components/Label";
-import { User } from "../../../types";
+import { NotificationCard, User } from "../../../types";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import Modal from "../../../components/Modal";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import { addUser } from "../../../store/action";
+import {
+  addNotification,
+  addUser,
+  removeNotification,
+} from "../../../store/action";
 
 type Props = {
   searchQuery: string;
@@ -70,7 +74,18 @@ function SearchAndFilterPanel({
     };
     dispatch(addUser(newUser));
     setAddUserModal(false);
-    reset(); // Reset the form after submission
+    reset();
+    const notification: NotificationCard = {
+      msg: "User added.",
+      type: "success",
+      id: Date.now().toString(),
+    };
+
+    dispatch(addNotification(notification));
+
+    setTimeout(() => {
+      dispatch(removeNotification(notification.id));
+    }, 5000);
   };
   return (
     <>
@@ -94,11 +109,11 @@ function SearchAndFilterPanel({
             id="rows"
             value={showItems}
           >
-            <option style={{ background: "black" }} value={2}>
+            <Option value={2}>
               2
-            </option>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
+            </Option>
+            <Option value={5}>5</Option>
+            <Option value={10}>10</Option>
           </ItemsSelect>
         </ItemsPerPageContainer>
         <FilterButton id="filter" onClick={() => setFilterOpen(!filterOpen)}>
@@ -147,7 +162,7 @@ function SearchAndFilterPanel({
         </FilterButton>
         <AddUserButton onClick={() => setAddUserModal(true)}>
           <FontAwesomeIcon icon={faPlus} />
-          <Label>New User</Label>
+          <Label sx={{color: 'white'}}>New User</Label>
         </AddUserButton>
       </Container>
       {addUserModal && (
@@ -284,10 +299,13 @@ export const FormField = styled.div`
 export const Input = styled.input`
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 4px;
   font-size: 1rem;
   outline: none;
+  background-color: ${(p) => p.theme.secondary};
+  color: ${(p) => p.theme.font};
+  box-shadow: ${(p) => p.theme.shadowInset};
 `;
 
 export const GeoContainer = styled.div`
@@ -298,13 +316,14 @@ export const GeoContainer = styled.div`
 
 export const GeoInput = styled(Input)`
   flex: 1;
-  background: #f0f0f0;
+  background: ${(p) => p.theme.secondary};
   cursor: not-allowed;
+  color: ${(p) => p.theme.font};
 `;
 
 export const GenerateButton = styled.button`
   padding: 0.5rem 1rem;
-  background: #007bff;
+  background: ${(p) => p.theme.blue};
   color: white;
   border: none;
   border-radius: 4px;
@@ -364,7 +383,7 @@ const SearchInput = styled.input<{ mode: string }>`
   background-color: transparent;
   font-size: 1rem;
   padding: 0 1rem;
-  box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadowInset};
   border-bottom-left-radius: 20px;
   border-top-left-radius: 20px;
 `;
@@ -375,7 +394,7 @@ const SearchButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #29b6f6;
+  background: ${(p) => p.theme.blue};
   color: white;
 `;
 
@@ -392,7 +411,7 @@ const ItemsSelect = styled.select<{ mode: string }>`
   padding: 0 0.2rem;
   border-radius: 5px;
   background-color: transparent;
-  box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadowInset};
   outline: none;
   border: none;
   color: ${(props) => (props.mode === "light" ? "black" : "white")};
@@ -409,8 +428,8 @@ const FilterButton = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  background: #29b6f6;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  background: ${(p) => p.theme.blue};
+  box-shadow: ${(p) => p.theme.shadow};
 `;
 
 const AddUserButton = styled.div`
@@ -419,9 +438,9 @@ const AddUserButton = styled.div`
   gap: 0.5rem;
   cursor: pointer;
   border-radius: 5px;
-  background: #29b6f6;
+  background: ${(p) => p.theme.blue};
   color: white;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadow};
   display: flex;
   align-items: center;
 `;
@@ -433,8 +452,8 @@ const DropdownContainer = styled.div`
   border-radius: 10px;
   padding: 1rem;
   overflow: hidden;
-  background-color: #fafafa;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  background-color: ${(p) => p.theme.secondary};
+  box-shadow: ${(p) => p.theme.shadow};
   position: absolute;
   top: 110%;
   right: 0%;
@@ -456,14 +475,16 @@ const DropdownContainer = styled.div`
 
 const FilterSection = styled.div`
   width: 140px;
-  background-color: #e4e5f1;
+  background-color: ${(p) => p.theme.tertiary};
   padding: 0.5rem;
   border-radius: 10px;
 `;
 
 const Divider = styled.div`
-  border-bottom: 1px solid black;
-  margin-top: 0.2rem;
+  width: 100%;
+  height: 1px;
+  background-color: ${(p) => p.theme.primary};
+  margin-top: 0.5rem;
 `;
 
 const FilterOption = styled.div`
@@ -477,6 +498,11 @@ const FilterOption = styled.div`
 const FilterCheckbox = styled.input`
   width: 1rem;
   height: 1rem;
+`;
+
+const Option = styled.option`
+background-color: ${(p) => p.theme.secondary};
+color: ${(p) => p.theme.font};
 `;
 
 export default SearchAndFilterPanel;

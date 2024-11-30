@@ -54,7 +54,7 @@ const StyledIcon = styled(FontAwesomeIcon)`
 const ToggleSwitch = styled.div`
   width: 70px;
   height: 30px;
-  box-shadow: inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: ${(p) => p.theme.shadowInset};
   border-radius: 20px;
   margin-left: auto;
   display: flex;
@@ -82,7 +82,7 @@ const ToggleCircle = styled.div<{ mode: string; isSun?: boolean }>`
     props.isSun
       ? props.mode === "light"
         ? "white"
-        : "black"
+        : "gray"
       : props.mode === "light"
       ? "black"
       : "white"};
