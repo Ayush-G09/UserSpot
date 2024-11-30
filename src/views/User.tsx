@@ -36,6 +36,11 @@ import Divider from "../components/Divider";
 
 type UserFormInputs = Omit<User, "id">;
 
+type State = {
+    deleteModal: boolean;
+    editUserModal: boolean;
+}
+
 const generateRandomCoordinate = (min: number, max: number) => {
   return (Math.random() * (max - min) + min).toFixed(6);
 };
@@ -50,8 +55,10 @@ function UserView() {
 
   const user = users.find((user) => user.id === Number(id));
 
-  const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [editUserModal, setEditUserModal] = useState<boolean>(false);
+  const [state, setState] = useState<State>({
+    deleteModal: false,
+    editUserModal: false,
+  });
 
   const handleDeleteUser = () => {
     dispatch(deleteUser(Number(id)));
@@ -114,7 +121,7 @@ function UserView() {
       id: user!.id,
     };
     dispatch(updateUser(newUser));
-    setEditUserModal(false);
+    setState((prev) => ({...prev, editUserModal: false}))
 
     const notification: NotificationCard = {
       msg: "User updated.",
@@ -150,14 +157,14 @@ function UserView() {
           </DetailRow>
           <ButtonGroup>
             <Button
-              onClick={() => setEditUserModal(true)}
+              onClick={() => setState((prev) => ({...prev, editUserModal: true}))}
               style={{ backgroundColor: "#0288d1" }}
             >
               <FontAwesomeIcon icon={faPen} />
               <Label sx={{color: 'white'}}>Edit</Label>
             </Button>
             <Button
-              onClick={() => setDeleteModal(true)}
+              onClick={() => setState((prev) => ({...prev, deleteModal: true}))}
               style={{ backgroundColor: "red" }}
             >
               <FontAwesomeIcon icon={faTrash} />
@@ -233,17 +240,17 @@ function UserView() {
           </Card>
         </RightSection>
       </StyledUserView>
-      {deleteModal && (
-        <Modal onClose={() => setDeleteModal(false)}>
+      {state.deleteModal && (
+        <Modal onClose={() => setState((prev) => ({...prev, deleteModal: false}))}>
           <DeleteModal
             handleDeleteUser={handleDeleteUser}
-            setDeleteModal={setDeleteModal}
+            setDeleteModal={() => setState((prev) => ({...prev, deleteModal: false}))}
             name={user?.name}
           />
         </Modal>
       )}
-      {editUserModal && (
-        <Modal onClose={() => setEditUserModal(false)}>
+      {state.editUserModal && (
+        <Modal onClose={() => setState((prev) => ({...prev, editUserModal: false}))}>
           <Label>Edit User</Label>
           <FormContainer onSubmit={handleSubmit(onSubmit)}>
             <FormField>

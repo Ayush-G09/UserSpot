@@ -17,14 +17,23 @@ import {
   removeNotification,
 } from "../../../store/action";
 import Modal from "../../../components/Modal";
+import DeleteModal from "../../../components/DeleteModal";
 
 type Props = {
   user: User;
 };
 
+type State = {
+  tooltipOpen: boolean;
+  deleteModal: boolean;
+}
+
 function UserCard({ user }: Props) {
   const mode = useSelector((state: RootState) => state.mode);
-  const [tooltipOpen, setTooltipOpen] = useState<boolean>(false);
+  const [state, setState] = useState<State>({
+    tooltipOpen: false,
+    deleteModal: false,
+  });
 
   const navigate = useNavigate();
 
@@ -33,9 +42,9 @@ function UserCard({ user }: Props) {
     const toolContainer = document.getElementById(`tool-container-${user.id}`);
 
     if (tooltipElement) {
-      tooltipElement.style.visibility = tooltipOpen ? "visible" : "hidden";
-      tooltipElement.style.opacity = tooltipOpen ? "1" : "0";
-      tooltipElement.style.transform = tooltipOpen ? "scaleY(1)" : "scaleY(0)";
+      tooltipElement.style.visibility = state.tooltipOpen ? "visible" : "hidden";
+      tooltipElement.style.opacity = state.tooltipOpen ? "1" : "0";
+      tooltipElement.style.transform = state.tooltipOpen ? "scaleY(1)" : "scaleY(0)";
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -45,25 +54,24 @@ function UserCard({ user }: Props) {
         tooltipElement &&
         !tooltipElement.contains(event.target as Node)
       ) {
-        setTooltipOpen(false);
+        setState((prev) => ({...prev, tooltipOpen: false}))
       }
     };
 
-    if (tooltipOpen) {
+    if (state.tooltipOpen) {
       document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [tooltipOpen, user.id]);
+  }, [state.tooltipOpen, user.id]);
 
-  const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const handleDeleteUser = () => {
     dispatch(deleteUser(user.id));
-    setDeleteModal(false);
+    setState((prev) => ({...prev, deleteModal: false}))
     const notification: NotificationCard = {
       msg: "User deleted.",
       type: "success",
@@ -104,7 +112,7 @@ function UserCard({ user }: Props) {
         <ToolContainer
           id={`tool-container-${user.id}`}
           mode={mode}
-          onClick={() => setTooltipOpen(!tooltipOpen)}
+          onClick={() => setState((prev) => ({...prev, tooltipOpen: !state.tooltipOpen}))}
         >
           <FontAwesomeIcon icon={faEllipsisVertical} />
           <Tooltip
@@ -121,7 +129,7 @@ function UserCard({ user }: Props) {
             </div>
             <div>
               <FontAwesomeIcon
-                onClick={() => setDeleteModal(true)}
+                onClick={() => setState((prev) => ({...prev, deleteModal: true}))}
                 size="xs"
                 color="red"
                 icon={faTrash}
@@ -130,29 +138,9 @@ function UserCard({ user }: Props) {
           </Tooltip>
         </ToolContainer>
       </UserCardWrapper>
-      {deleteModal && (
-        <Modal onClose={() => setDeleteModal(false)}>
-          <Label size="1.2rem">Are you sure?</Label>
-          <Label sx={{ marginTop: "2rem" }}>
-            Delete {user?.name} data it can't be recovered.
-          </Label>
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "end",
-              gap: "2rem",
-              marginTop: "2rem",
-            }}
-          >
-            <ModalButton bgColor="green" onClick={handleDeleteUser}>
-              Delete
-            </ModalButton>
-            <ModalButton bgColor="red" onClick={() => setDeleteModal(false)}>
-              Cancel
-            </ModalButton>
-          </div>
+      {state.deleteModal && (
+        <Modal onClose={() => setState((prev) => ({...prev, deleteModal: false}))}>
+          <DeleteModal handleDeleteUser={handleDeleteUser} name={user?.name} setDeleteModal={() => setState((prev) => ({...prev, deleteModal: false}))}/>
         </Modal>
       )}
     </>

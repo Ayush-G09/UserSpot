@@ -28,21 +28,35 @@ const fetchUsers = async (): Promise<User[]> => {
   return response.data;
 };
 
+type State = {
+  users: User[];
+  pageData: User[];
+  currentPage: number;
+  totalPage: number;
+  showItems: number
+  searchQuery: string;
+  filterOpen: boolean;
+  filterData: string[];
+  sortData: {
+    name: 0 | 1 | 2;
+    email: 0 | 1 | 2;
+  };
+};
+
 function List() {
   const mode = useSelector((state: RootState) => state.mode);
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [pageData, setPageData] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(0);
-  const [showItems, setShowItems] = useState<number>(5);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filterOpen, setFilterOpen] = useState<boolean>(false);
-  const [filterData, setFilterData] = useState<string[]>([]);
-  const [sortData, setSortData] = useState<{
-    name: 0 | 1 | 2;
-    email: 0 | 1 | 2;
-  }>({ name: 1, email: 1 });
+  const [state, setState] = useState<State>({
+    users: [],
+    pageData: [],
+    currentPage: 1,
+    totalPage: 0,
+    showItems: 5,
+    searchQuery: '',
+    filterOpen: false,
+    filterData: [],
+    sortData: {name: 1, email: 1},
+  });
 
   const dispatch = useDispatch();
   const orgData = useSelector((state: RootState) => state.users);
@@ -53,13 +67,13 @@ function List() {
   });
 
   const getUsers = () => {
-    const startIndex = (currentPage - 1) * showItems;
-    const endIndex = startIndex + showItems;
-    return users.slice(startIndex, endIndex);
+    const startIndex = (state.currentPage - 1) * state.showItems;
+    const endIndex = startIndex + state.showItems;
+    return state.users.slice(startIndex, endIndex);
   };
 
   const searchUsers = () => {
-    const lowercasedQuery = searchQuery.toLowerCase();
+    const lowercasedQuery = state.searchQuery.toLowerCase();
 
     return orgData.filter(
       (user) =>
@@ -71,34 +85,30 @@ function List() {
 
   useEffect(() => {
     if (data && !orgData.length) {
-      setUsers(data);
-      setTotalPage(Math.ceil(data.length / showItems));
-      setPageData(data);
+      setState((prev) => ({...prev, users: data, totalPage: Math.ceil(data.length / state.showItems), pageData: data}));
       dispatch(addUsers(data));
     } else {
-      setUsers(orgData);
-      setTotalPage(Math.ceil(orgData.length / showItems));
-      setPageData(orgData);
+      setState((prev) => ({...prev, users: orgData, totalPage: Math.ceil(orgData.length / state.showItems), pageData: orgData}));
     }
   }, [data, orgData]);
 
   useEffect(() => {
-    setTotalPage(Math.ceil(users.length / showItems));
-    if (currentPage > Math.ceil(users.length / showItems)) {
-      setCurrentPage(1);
+    setState((prev) => ({...prev, totalPage: Math.ceil(state.users.length / state.showItems)}));
+    if (state.currentPage > Math.ceil(state.users.length / state.showItems)) {
+      setState((prev) => ({...prev, currentPage: 1}));
     }
-  }, [showItems]);
+  }, [state.showItems]);
 
   useEffect(() => {
     const data = getUsers();
-    setPageData(data);
-  }, [currentPage, totalPage, showItems, users]);
+    setState((prev) => ({...prev, pageData: data}));
+  }, [state.currentPage, state.totalPage, state.showItems, state.users]);
 
   useEffect(() => {
     let filteredUser: User[] = [];
 
     // If searchQuery is present, perform the search
-    if (searchQuery.trim()) {
+    if (state.searchQuery.trim()) {
       filteredUser = searchUsers();
     } else {
       // Use the original dataset when searchQuery is empty
@@ -106,9 +116,9 @@ function List() {
     }
 
     // If there are filter criteria in filterData, apply the filters
-    if (filterData.length) {
+    if (state.filterData.length) {
       const newUsers = filteredUser.filter((user) => {
-        return filterData.some((data) => {
+        return state.filterData.some((data) => {
           const cityMatch = user.address?.city
             ?.toLowerCase()
             .includes(data.toLowerCase());
@@ -130,25 +140,23 @@ function List() {
     // Set the filtered users or revert to the original data
     if (
       filteredUser.length > 0 ||
-      searchQuery.trim() ||
+      state.searchQuery.trim() ||
       filteredUser.length > 0
     ) {
-      setUsers(filteredUser);
-      setTotalPage(Math.ceil(filteredUser.length / showItems));
-      if (currentPage > Math.ceil(filteredUser.length / showItems)) {
-        setCurrentPage(1);
+      setState((prev) => ({...prev, users: filteredUser, totalPage: Math.ceil(filteredUser.length / state.showItems)}));
+      if (state.currentPage > Math.ceil(filteredUser.length / state.showItems)) {
+        setState((prev) => ({...prev, currentPage: 1}));
       }
     } else {
-      setUsers(orgData);
-      setTotalPage(Math.ceil(orgData.length / showItems));
-      if (currentPage > Math.ceil(orgData.length / showItems)) {
-        setCurrentPage(1);
+      setState((prev) => ({...prev, users: orgData, totalPage: Math.ceil(orgData.length / state.showItems)}));
+      if (state.currentPage > Math.ceil(orgData.length / state.showItems)) {
+        setState((prev) => ({...prev, currentPage: 1}));
       }
     }
-  }, [searchQuery, filterData]);
+  }, [state.searchQuery, state.filterData]);
 
   const changePage = (value: number) => {
-    setCurrentPage(currentPage + value);
+    setState((prev) => ({...prev, currentPage: state.currentPage + value}));
   };
 
   useEffect(() => {
@@ -157,9 +165,9 @@ function List() {
 
     // Update filter container styles
     if (filterCon) {
-      filterCon.style.visibility = filterOpen ? "visible" : "hidden";
-      filterCon.style.opacity = filterOpen ? "1" : "0";
-      filterCon.style.transform = filterOpen ? "scaleY(1)" : "scaleY(0)";
+      filterCon.style.visibility = state.filterOpen ? "visible" : "hidden";
+      filterCon.style.opacity = state.filterOpen ? "1" : "0";
+      filterCon.style.transform = state.filterOpen ? "scaleY(1)" : "scaleY(0)";
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -169,81 +177,69 @@ function List() {
         filter &&
         !filter.contains(event.target as Node)
       ) {
-        setFilterOpen(false);
+        setState((prev) => ({...prev, filterOpen: false}));
       }
     };
 
-    if (filterOpen) {
+    if (state.filterOpen) {
       document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [filterOpen]);
+  }, [state.filterOpen]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
-    setFilterData((prevFilterData) => {
-      if (prevFilterData.includes(value)) {
-        // If value is already in the array, remove it
-        return prevFilterData.filter((item) => item !== value);
-      } else {
-        // If value is not in the array, add it
-        return [...prevFilterData, value];
-      }
-    });
+    setState((prev) => ({...prev, filterData: prev.filterData.includes(value) ? prev.filterData.filter((item) => item !== value) : [...prev.filterData, value]}));
   };
 
   const toggleSort = (field: "name" | "email") => {
-    setSortData((prevState) => ({
-      ...prevState,
-      [field]: prevState[field] === 2 ? 0 : prevState[field] + 1,
-    }));
+    setState((prev) => ({...prev, sortData: {...prev.sortData, [field]: prev.sortData[field] === 2 ? 0 : prev.sortData[field] + 1}}))
   };
 
   useEffect(() => {
     const sortUsers = () => {
-      if (users.length) {
-        let sortedUsers = [...users]; // Create a copy to avoid mutating the original array
+      if (state.users.length) {
+        let sortedUsers = [...state.users]; // Create a copy to avoid mutating the original array
 
         // Sort by name if needed
-        if (sortData.name === 0) {
+        if (state.sortData.name === 0) {
           sortedUsers.sort((a, b) => b.name.localeCompare(a.name)); // Descending
-        } else if (sortData.name === 2) {
+        } else if (state.sortData.name === 2) {
           sortedUsers.sort((a, b) => a.name.localeCompare(b.name)); // Ascending
         }
 
         // Sort by email if needed
-        if (sortData.email === 0) {
+        if (state.sortData.email === 0) {
           sortedUsers.sort((a, b) => b.email.localeCompare(a.email)); // Descending
-        } else if (sortData.email === 2) {
+        } else if (state.sortData.email === 2) {
           sortedUsers.sort((a, b) => a.email.localeCompare(b.email)); // Ascending
         }
 
         // Update the state
-        setUsers(sortedUsers);
+        setState((prev) => ({...prev, users: sortedUsers}));
       }
     };
 
     sortUsers();
-  }, [sortData]);
+  }, [state.sortData]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error instanceof Error) return <div>Error: {error.message}</div>;
   return (
     <Container>
       <SearchAndFilterPanel
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        setShowItems={setShowItems}
-        showItems={showItems}
-        setFilterOpen={setFilterOpen}
-        filterOpen={filterOpen}
+        searchQuery={state.searchQuery}
+        setSearchQuery={(e) => setState((prev) => ({...prev, searchQuery: e}))}
+        setShowItems={(e) => setState((prev) => ({...prev, showItems: e}))}
+        showItems={state.showItems}
+        setFilterOpen={(e) => setState((prev) => ({...prev, filterOpen: e}))}
+        filterOpen={state.filterOpen}
         handleFilterChange={handleFilterChange}
-        orgData={orgData}
-        filterData={filterData}
+        orgData={state.pageData}
+        filterData={state.filterData}
       />
       <ListContent>
         <Header>
@@ -252,18 +248,18 @@ function List() {
             <FontAwesomeIcon
               onClick={() => toggleSort("name")}
               icon={
-                sortData.name === 0
+                state.sortData.name === 0
                   ? faCaretDown
-                  : sortData.name === 1
+                  : state.sortData.name === 1
                   ? faMinus
                   : faCaretUp
               }
               style={{
                 marginLeft: "auto",
                 color:
-                  sortData.name === 0
+                state.sortData.name === 0
                     ? "red"
-                    : sortData.name === 1
+                    : state.sortData.name === 1
                     ? "gray"
                     : "green",
                 cursor: "pointer",
@@ -275,18 +271,18 @@ function List() {
             <FontAwesomeIcon
               onClick={() => toggleSort("email")}
               icon={
-                sortData.email === 0
+                state.sortData.email === 0
                   ? faCaretDown
-                  : sortData.email === 1
+                  : state.sortData.email === 1
                   ? faMinus
                   : faCaretUp
               }
               style={{
                 marginLeft: "auto",
                 color:
-                  sortData.email === 0
+                state.sortData.email === 0
                     ? "red"
-                    : sortData.email === 1
+                    : state.sortData.email === 1
                     ? "gray"
                     : "green",
                 cursor: "pointer",
@@ -296,7 +292,7 @@ function List() {
           <Label sx={{ color: "gray", width: "34%" }}>Address</Label>
           <Label sx={{ color: "gray", width: "18%" }}>Company</Label>
         </Header>
-        {pageData.map((user) => (
+        {state.pageData.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
       </ListContent>
@@ -305,24 +301,24 @@ function List() {
           <PaginationButton
             onClick={() => changePage(-1)}
             style={{
-              pointerEvents: currentPage <= 1 ? "none" : "auto",
+              pointerEvents: state.currentPage <= 1 ? "none" : "auto",
               borderRight: `3px solid ${mode === 'light' ? '#d2d3db' : '#252526'}`,
             }}
           >
             <FontAwesomeIcon icon={faAngleLeft} />
-            {currentPage <= 1 && (
+            {state.currentPage <= 1 && (
               <Label>
-                {currentPage} OF {totalPage}
+                {state.currentPage} OF {state.totalPage}
               </Label>
             )}
           </PaginationButton>
           <PaginationButton
             onClick={() => changePage(1)}
-            style={{ pointerEvents: currentPage < totalPage ? "auto" : "none" }}
+            style={{ pointerEvents: state.currentPage < state.totalPage ? "auto" : "none" }}
           >
-            {currentPage > 1 && (
+            {state.currentPage > 1 && (
               <Label>
-                {currentPage} OF {totalPage}
+                {state.currentPage} OF {state.totalPage}
               </Label>
             )}
             <FontAwesomeIcon icon={faAngleRight} />
