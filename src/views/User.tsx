@@ -32,6 +32,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { NotificationCard, User } from "../types";
 import DeleteModal from "../components/DeleteModal";
 import styled from "styled-components";
+import Divider from "../components/Divider";
 
 type UserFormInputs = Omit<User, "id">;
 
@@ -443,12 +444,6 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-`;
-
-const Divider = styled.div`
-  width: 100%;
-  background: ${(p) => p.theme.primary};
-  height: 1px;
 `;
 
 const CardDetailRow = styled.div`

@@ -17,6 +17,7 @@ import {
   addUser,
   removeNotification,
 } from "../../../store/action";
+import Divider from "../../../components/Divider";
 
 type Props = {
   searchQuery: string;
@@ -125,7 +126,7 @@ function SearchAndFilterPanel({
             className={filterOpen ? "active" : ""}
           >
             <FilterSection>
-              <Label>City</Label>
+              <Label sx={{marginBottom: '0.5rem'}}>City</Label>
               <Divider />
               {orgData.map((data) => (
                 <FilterOption key={`${data.id}${data.address.city}`}>
@@ -142,7 +143,7 @@ function SearchAndFilterPanel({
               ))}
             </FilterSection>
             <FilterSection>
-              <Label>Company</Label>
+              <Label sx={{marginBottom: '0.5rem'}}>Company</Label>
               <Divider />
               {orgData.map((data) => (
                 <FilterOption key={`${data.id}${data.company.name}`}>
@@ -478,13 +479,6 @@ const FilterSection = styled.div`
   background-color: ${(p) => p.theme.tertiary};
   padding: 0.5rem;
   border-radius: 10px;
-`;
-
-const Divider = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: ${(p) => p.theme.primary};
-  margin-top: 0.5rem;
 `;
 
 const FilterOption = styled.div`
