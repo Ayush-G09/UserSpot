@@ -1,4 +1,13 @@
-import { Action, SET_MODE, ADD_USER, UPDATE_USER, DELETE_USER, ADD_USERS, ADD_NOTIFICATION, REMOVE_NOTIFICATION } from "./action";
+import {
+  Action,
+  SET_MODE,
+  ADD_USER,
+  UPDATE_USER,
+  DELETE_USER,
+  ADD_USERS,
+  ADD_NOTIFICATION,
+  REMOVE_NOTIFICATION,
+} from "./action";
 import { NotificationCard, User } from "../types";
 
 type State = {
@@ -12,7 +21,6 @@ const initialState: State = {
   users: [],
   notifications: [], // Initialize the notifications array
 };
-
 
 const reducer = (state: State = initialState, action: Action): State => {
   switch (action.type) {
@@ -39,19 +47,19 @@ const reducer = (state: State = initialState, action: Action): State => {
     case ADD_USERS:
       return { ...state, users: [...state.users, ...action.payload] };
 
-      case ADD_NOTIFICATION:
-        return {
-          ...state,
-          notifications: [...state.notifications, action.payload],
-        };
-  
-      case REMOVE_NOTIFICATION:
-        return {
-          ...state,
-          notifications: state.notifications.filter(
-            (notification) => notification.id !== action.payload
-          ),
-        };
+    case ADD_NOTIFICATION:
+      return {
+        ...state,
+        notifications: [...state.notifications, action.payload],
+      };
+
+    case REMOVE_NOTIFICATION:
+      return {
+        ...state,
+        notifications: state.notifications.filter(
+          (notification) => notification.id !== action.payload
+        ),
+      };
 
     default:
       return state;

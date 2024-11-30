@@ -71,7 +71,9 @@ type RemoveNotificationAction = {
 };
 
 // Action creators for notifications
-export const addNotification = (notification: NotificationCard): AddNotificationAction => ({
+export const addNotification = (
+  notification: NotificationCard
+): AddNotificationAction => ({
   type: ADD_NOTIFICATION,
   payload: notification,
 });
@@ -88,5 +90,4 @@ export type Action =
   | DeleteUserAction
   | AddUsersAction
   | AddNotificationAction
-  | RemoveNotificationAction
-  ;
+  | RemoveNotificationAction;

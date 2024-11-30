@@ -16,67 +16,21 @@ function Header() {
     const newMode = mode === "dark" ? "light" : "dark";
     dispatch(setMode(newMode));
   };
+
   return (
     <StyledHeader>
-      <FontAwesomeIcon
-        icon={faHubspot}
-        style={{ fontSize: "1.5rem", color: "red" }}
-      />
+      <StyledIcon icon={faHubspot} />
       <Label size="1.2rem" weight="bold">
         UserSpot
       </Label>
-      <div
-        style={{
-          width: "70px",
-          height: "30px",
-          boxShadow: "inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3)",
-          borderRadius: "20px",
-          marginLeft: "auto",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 3px",
-          position: "relative",
-        }}
-      >
-        <div
-          onClick={toggleMode}
-          style={{
-            width: "25px",
-            height: "25px",
-            borderRadius: "50%",
-            backgroundColor: mode === "light" ? "transparent" : "gray",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: mode === "light" ? "black" : "white",
-            cursor: "pointer",
-            position: "absolute",
-            left: mode === "light" ? 2 : 48,
-            transition: "0.3s ease-in-out",
-          }}
-        >
+      <ToggleSwitch>
+        <ToggleCircle onClick={toggleMode} mode={mode}>
           <FontAwesomeIcon icon={faMoon} />
-        </div>
-        <div
-          onClick={toggleMode}
-          style={{
-            width: "25px",
-            height: "25px",
-            borderRadius: "50%",
-            backgroundColor: mode === "light" ? "orange" : "transparent",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: mode === "light" ? "white" : "black",
-            cursor: "pointer",
-            position: "absolute",
-            left: mode === "light" ? 48 : 2,
-            transition: "0.3s ease-in-out",
-          }}
-        >
+        </ToggleCircle>
+        <ToggleCircle onClick={toggleMode} mode={mode} isSun>
           <FontAwesomeIcon icon={faSun} />
-        </div>
-      </div>
+        </ToggleCircle>
+      </ToggleSwitch>
     </StyledHeader>
   );
 }
@@ -90,6 +44,52 @@ const StyledHeader = styled.div`
   align-items: center;
   padding: 0 1rem;
   gap: 0.5rem;
+`;
+
+const StyledIcon = styled(FontAwesomeIcon)`
+  font-size: 1.5rem;
+  color: red;
+`;
+
+const ToggleSwitch = styled.div`
+  width: 70px;
+  height: 30px;
+  box-shadow: inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  position: relative;
+`;
+
+const ToggleCircle = styled.div<{ mode: string; isSun?: boolean }>`
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: ${(props) =>
+    props.isSun
+      ? props.mode === "light"
+        ? "orange"
+        : "transparent"
+      : props.mode === "light"
+      ? "transparent"
+      : "gray"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${(props) =>
+    props.isSun
+      ? props.mode === "light"
+        ? "white"
+        : "black"
+      : props.mode === "light"
+      ? "black"
+      : "white"};
+  cursor: pointer;
+  position: absolute;
+  left: ${(props) => (props.isSun ? (props.mode === "light" ? "48px" : "2px") : props.mode === "light" ? "2px" : "48px")};
+  transition: 0.3s ease-in-out;
 `;
 
 export default Header;
