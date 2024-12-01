@@ -22,6 +22,7 @@ import { addUsers } from "../../store/action";
 import { RootState } from "../../store/store";
 import { User } from "../../types";
 import styled from "styled-components";
+import { DotLoader } from "react-spinners";
 
 const fetchUsers = async (): Promise<User[]> => {
   const response = await axiosInstance.get("/users");
@@ -226,8 +227,8 @@ function List() {
     sortUsers();
   }, [state.sortData]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error instanceof Error) return <div>Error: {error.message}</div>;
+  if (isLoading) return <Container style={{justifyContent: 'center'}}><DotLoader color="#0288d1"/></Container>;
+  if (error instanceof Error) return <Container style={{justifyContent: 'center'}}><Label sx={{color: 'red'}}>Error: {error.message}</Label></Container>;
   return (
     <Container>
       <SearchAndFilterPanel
