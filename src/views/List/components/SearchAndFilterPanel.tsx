@@ -4,7 +4,7 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Label from "../../../components/Label";
 import { NotificationCard, User } from "../../../types";
 import { useDispatch, useSelector } from "react-redux";
@@ -88,6 +88,43 @@ function SearchAndFilterPanel({
       dispatch(removeNotification(notification.id));
     }, 5000);
   };
+
+  const FilterCitySectionMemo = useMemo(() => (
+    <FilterSection>
+      <Label sx={{ marginBottom: '0.5rem' }}>City</Label>
+      <Divider />
+      {orgData.map((data) => (
+        <FilterOption key={`${data.id}${data.address.city}`}>
+          <Label size="0.7rem" weight="bold">{data.address.city}</Label>
+          <FilterCheckbox
+            onChange={(e) => handleFilterChange(e)}
+            checked={filterData.includes(data.address.city)}
+            type="checkbox"
+            value={data.address.city}
+          />
+        </FilterOption>
+      ))}
+    </FilterSection>
+  ), [orgData, filterData, handleFilterChange]);
+
+  const FilterCompanySectionMemo = useMemo(() => (
+    <FilterSection>
+      <Label sx={{ marginBottom: '0.5rem' }}>City</Label>
+      <Divider />
+      {orgData.map((data) => (
+        <FilterOption key={`${data.id}${data.company.name}`}>
+          <Label size="0.7rem" weight="bold">{data.company.name}</Label>
+          <FilterCheckbox
+            onChange={(e) => handleFilterChange(e)}
+            checked={filterData.includes(data.company.name)}
+            type="checkbox"
+            value={data.company.name}
+          />
+        </FilterOption>
+      ))}
+    </FilterSection>
+  ), [orgData, filterData, handleFilterChange]);
+
   return (
     <>
       <Container>
@@ -125,40 +162,8 @@ function SearchAndFilterPanel({
             id="filter-con"
             className={filterOpen ? "active" : ""}
           >
-            <FilterSection>
-              <Label sx={{marginBottom: '0.5rem'}}>City</Label>
-              <Divider />
-              {orgData.map((data) => (
-                <FilterOption key={`${data.id}${data.address.city}`}>
-                  <Label size="0.7rem" weight="bold">
-                    {data.address.city}
-                  </Label>
-                  <FilterCheckbox
-                    onChange={(e) => handleFilterChange(e)}
-                    checked={filterData.includes(data.address.city)}
-                    type="checkbox"
-                    value={data.address.city}
-                  />
-                </FilterOption>
-              ))}
-            </FilterSection>
-            <FilterSection>
-              <Label sx={{marginBottom: '0.5rem'}}>Company</Label>
-              <Divider />
-              {orgData.map((data) => (
-                <FilterOption key={`${data.id}${data.company.name}`}>
-                  <Label size="0.7rem" weight="bold">
-                    {data.company.name}
-                  </Label>
-                  <FilterCheckbox
-                    onChange={(e) => handleFilterChange(e)}
-                    checked={filterData.includes(data.company.name)}
-                    type="checkbox"
-                    value={data.company.name}
-                  />
-                </FilterOption>
-              ))}
-            </FilterSection>
+            {FilterCitySectionMemo}
+            {FilterCompanySectionMemo}
           </DropdownContainer>
         </FilterButton>
         <AddUserButton onClick={() => setAddUserModal(true)}>

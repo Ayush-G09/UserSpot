@@ -1,18 +1,13 @@
 import {
   faAngleLeft,
   faAngleRight,
-  faArrowUpRightFromSquare,
   faCaretDown,
   faCaretUp,
-  faEllipsisVertical,
-  faFilter,
-  faMagnifyingGlass,
   faMinus,
-  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../axios/axiosInstance";
 import Label from "../../components/Label";
@@ -34,7 +29,7 @@ type State = {
   pageData: User[];
   currentPage: number;
   totalPage: number;
-  showItems: number
+  showItems: number;
   searchQuery: string;
   filterOpen: boolean;
   filterData: string[];
@@ -45,7 +40,14 @@ type State = {
 };
 
 function List() {
+  const dispatch = useDispatch();
+  const orgData = useSelector((state: RootState) => state.users);
   const mode = useSelector((state: RootState) => state.mode);
+
+  const { data, isLoading, error } = useQuery<User[], Error>({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+  });
 
   const [state, setState] = useState<State>({
     users: [],
@@ -53,56 +55,61 @@ function List() {
     currentPage: 1,
     totalPage: 0,
     showItems: 5,
-    searchQuery: '',
+    searchQuery: "",
     filterOpen: false,
     filterData: [],
-    sortData: {name: 1, email: 1},
+    sortData: { name: 1, email: 1 },
   });
 
-  const dispatch = useDispatch();
-  const orgData = useSelector((state: RootState) => state.users);
-
-  const { data, isLoading, error } = useQuery<User[], Error>({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-  });
-
-  const getUsers = () => {
+  const getUsers = useCallback(() => {
     const startIndex = (state.currentPage - 1) * state.showItems;
     const endIndex = startIndex + state.showItems;
     return state.users.slice(startIndex, endIndex);
-  };
+  }, [state.currentPage, state.showItems, state.users]);
 
-  const searchUsers = () => {
+  const searchUsers = useCallback(() => {
     const lowercasedQuery = state.searchQuery.toLowerCase();
-
     return orgData.filter(
       (user) =>
         user.name.toLowerCase().includes(lowercasedQuery) ||
         user.email.toLowerCase().includes(lowercasedQuery) ||
         user.company.name.toLowerCase().includes(lowercasedQuery)
     );
-  };
+  }, [state.searchQuery, orgData]);
 
   useEffect(() => {
     if (data && !orgData.length) {
-      setState((prev) => ({...prev, users: data, totalPage: Math.ceil(data.length / state.showItems), pageData: data}));
+      setState((prev) => ({
+        ...prev,
+        users: data,
+        totalPage: Math.ceil(data.length / state.showItems),
+        pageData: data,
+      }));
       dispatch(addUsers(data));
     } else {
-      setState((prev) => ({...prev, users: orgData, totalPage: Math.ceil(orgData.length / state.showItems), pageData: orgData}));
+      const pageData = getUsers();
+      setState((prev) => ({
+        ...prev,
+        users: orgData,
+        totalPage: Math.ceil(orgData.length / state.showItems),
+        pageData: pageData,
+      }));
     }
   }, [data, orgData]);
 
   useEffect(() => {
-    setState((prev) => ({...prev, totalPage: Math.ceil(state.users.length / state.showItems)}));
+    setState((prev) => ({
+      ...prev,
+      totalPage: Math.ceil(state.users.length / state.showItems),
+    }));
     if (state.currentPage > Math.ceil(state.users.length / state.showItems)) {
-      setState((prev) => ({...prev, currentPage: 1}));
+      setState((prev) => ({ ...prev, currentPage: 1 }));
     }
   }, [state.showItems]);
 
   useEffect(() => {
     const data = getUsers();
-    setState((prev) => ({...prev, pageData: data}));
+    setState((prev) => ({ ...prev, pageData: data }));
   }, [state.currentPage, state.totalPage, state.showItems, state.users]);
 
   useEffect(() => {
@@ -144,20 +151,30 @@ function List() {
       state.searchQuery.trim() ||
       filteredUser.length > 0
     ) {
-      setState((prev) => ({...prev, users: filteredUser, totalPage: Math.ceil(filteredUser.length / state.showItems)}));
-      if (state.currentPage > Math.ceil(filteredUser.length / state.showItems)) {
-        setState((prev) => ({...prev, currentPage: 1}));
+      setState((prev) => ({
+        ...prev,
+        users: filteredUser,
+        totalPage: Math.ceil(filteredUser.length / state.showItems),
+      }));
+      if (
+        state.currentPage > Math.ceil(filteredUser.length / state.showItems)
+      ) {
+        setState((prev) => ({ ...prev, currentPage: 1 }));
       }
     } else {
-      setState((prev) => ({...prev, users: orgData, totalPage: Math.ceil(orgData.length / state.showItems)}));
+      setState((prev) => ({
+        ...prev,
+        users: orgData,
+        totalPage: Math.ceil(orgData.length / state.showItems),
+      }));
       if (state.currentPage > Math.ceil(orgData.length / state.showItems)) {
-        setState((prev) => ({...prev, currentPage: 1}));
+        setState((prev) => ({ ...prev, currentPage: 1 }));
       }
     }
   }, [state.searchQuery, state.filterData]);
 
   const changePage = (value: number) => {
-    setState((prev) => ({...prev, currentPage: state.currentPage + value}));
+    setState((prev) => ({ ...prev, currentPage: state.currentPage + value }));
   };
 
   useEffect(() => {
@@ -178,7 +195,7 @@ function List() {
         filter &&
         !filter.contains(event.target as Node)
       ) {
-        setState((prev) => ({...prev, filterOpen: false}));
+        setState((prev) => ({ ...prev, filterOpen: false }));
       }
     };
 
@@ -193,11 +210,22 @@ function List() {
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setState((prev) => ({...prev, filterData: prev.filterData.includes(value) ? prev.filterData.filter((item) => item !== value) : [...prev.filterData, value]}));
+    setState((prev) => ({
+      ...prev,
+      filterData: prev.filterData.includes(value)
+        ? prev.filterData.filter((item) => item !== value)
+        : [...prev.filterData, value],
+    }));
   };
 
   const toggleSort = (field: "name" | "email") => {
-    setState((prev) => ({...prev, sortData: {...prev.sortData, [field]: prev.sortData[field] === 2 ? 0 : prev.sortData[field] + 1}}))
+    setState((prev) => ({
+      ...prev,
+      sortData: {
+        ...prev.sortData,
+        [field]: prev.sortData[field] === 2 ? 0 : prev.sortData[field] + 1,
+      },
+    }));
   };
 
   useEffect(() => {
@@ -220,23 +248,35 @@ function List() {
         }
 
         // Update the state
-        setState((prev) => ({...prev, users: sortedUsers}));
+        setState((prev) => ({ ...prev, users: sortedUsers }));
       }
     };
 
     sortUsers();
   }, [state.sortData]);
 
-  if (isLoading) return <Container style={{justifyContent: 'center'}}><DotLoader color="#0288d1"/></Container>;
-  if (error instanceof Error) return <Container style={{justifyContent: 'center'}}><Label sx={{color: 'red'}}>Error: {error.message}</Label></Container>;
+  if (isLoading)
+    return (
+      <Container style={{ justifyContent: "center" }}>
+        <DotLoader color="#0288d1" />
+      </Container>
+    );
+  if (error instanceof Error)
+    return (
+      <Container style={{ justifyContent: "center" }}>
+        <Label sx={{ color: "red" }}>Error: {error.message}</Label>
+      </Container>
+    );
   return (
     <Container>
       <SearchAndFilterPanel
         searchQuery={state.searchQuery}
-        setSearchQuery={(e) => setState((prev) => ({...prev, searchQuery: e}))}
-        setShowItems={(e) => setState((prev) => ({...prev, showItems: e}))}
+        setSearchQuery={(e) =>
+          setState((prev) => ({ ...prev, searchQuery: e }))
+        }
+        setShowItems={(e) => setState((prev) => ({ ...prev, showItems: e }))}
         showItems={state.showItems}
-        setFilterOpen={(e) => setState((prev) => ({...prev, filterOpen: e}))}
+        setFilterOpen={(e) => setState((prev) => ({ ...prev, filterOpen: e }))}
         filterOpen={state.filterOpen}
         handleFilterChange={handleFilterChange}
         orgData={state.pageData}
@@ -258,7 +298,7 @@ function List() {
               style={{
                 marginLeft: "auto",
                 color:
-                state.sortData.name === 0
+                  state.sortData.name === 0
                     ? "red"
                     : state.sortData.name === 1
                     ? "gray"
@@ -281,7 +321,7 @@ function List() {
               style={{
                 marginLeft: "auto",
                 color:
-                state.sortData.email === 0
+                  state.sortData.email === 0
                     ? "red"
                     : state.sortData.email === 1
                     ? "gray"
@@ -303,7 +343,9 @@ function List() {
             onClick={() => changePage(-1)}
             style={{
               pointerEvents: state.currentPage <= 1 ? "none" : "auto",
-              borderRight: `3px solid ${mode === 'light' ? '#d2d3db' : '#252526'}`,
+              borderRight: `3px solid ${
+                mode === "light" ? "#d2d3db" : "#252526"
+              }`,
             }}
           >
             <FontAwesomeIcon icon={faAngleLeft} />
@@ -315,7 +357,10 @@ function List() {
           </PaginationButton>
           <PaginationButton
             onClick={() => changePage(1)}
-            style={{ pointerEvents: state.currentPage < state.totalPage ? "auto" : "none" }}
+            style={{
+              pointerEvents:
+                state.currentPage < state.totalPage ? "auto" : "none",
+            }}
           >
             {state.currentPage > 1 && (
               <Label>
@@ -383,11 +428,11 @@ const PaginationContainer = styled.div`
 `;
 
 const PaginationButton = styled.div`
-padding: 0.3rem 1rem;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 1rem;
+  padding: 0.3rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 export default List;

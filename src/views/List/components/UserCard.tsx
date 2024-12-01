@@ -26,7 +26,7 @@ type Props = {
 type State = {
   tooltipOpen: boolean;
   deleteModal: boolean;
-}
+};
 
 function UserCard({ user }: Props) {
   const mode = useSelector((state: RootState) => state.mode);
@@ -54,7 +54,7 @@ function UserCard({ user }: Props) {
         tooltipElement &&
         !tooltipElement.contains(event.target as Node)
       ) {
-        setState((prev) => ({...prev, tooltipOpen: false}))
+        setState((prev) => ({ ...prev, tooltipOpen: false }));
       }
     };
 
@@ -71,7 +71,7 @@ function UserCard({ user }: Props) {
 
   const handleDeleteUser = () => {
     dispatch(deleteUser(user.id));
-    setState((prev) => ({...prev, deleteModal: false}))
+    setState((prev) => ({ ...prev, deleteModal: false }));
     const notification: NotificationCard = {
       msg: "User deleted.",
       type: "success",
@@ -83,6 +83,12 @@ function UserCard({ user }: Props) {
     setTimeout(() => {
       dispatch(removeNotification(notification.id));
     }, 5000);
+  };
+
+  const tooltipStyles: React.CSSProperties = {
+    visibility: state.tooltipOpen ? "visible" : "hidden",
+    opacity: state.tooltipOpen ? "1" : "0",
+    transform: state.tooltipOpen ? "scaleY(1)" : "scaleY(0)",
   };
 
   return (
@@ -112,11 +118,14 @@ function UserCard({ user }: Props) {
         <ToolContainer
           id={`tool-container-${user.id}`}
           mode={mode}
-          onClick={() => setState((prev) => ({...prev, tooltipOpen: !state.tooltipOpen}))}
+          onClick={() =>
+            setState((prev) => ({ ...prev, tooltipOpen: !state.tooltipOpen }))
+          }
         >
           <FontAwesomeIcon icon={faEllipsisVertical} />
           <Tooltip
             id={`tooltip-${user.id}`}
+            style={tooltipStyles} // Cast the style to React.CSSProperties
             onClick={(e) => e.stopPropagation()}
           >
             <div>
@@ -129,7 +138,7 @@ function UserCard({ user }: Props) {
             </div>
             <div>
               <FontAwesomeIcon
-                onClick={() => setState((prev) => ({...prev, deleteModal: true}))}
+                onClick={() => setState((prev) => ({ ...prev, deleteModal: true }))}
                 size="xs"
                 color="red"
                 icon={faTrash}
@@ -139,8 +148,12 @@ function UserCard({ user }: Props) {
         </ToolContainer>
       </UserCardWrapper>
       {state.deleteModal && (
-        <Modal onClose={() => setState((prev) => ({...prev, deleteModal: false}))}>
-          <DeleteModal handleDeleteUser={handleDeleteUser} name={user?.name} setDeleteModal={() => setState((prev) => ({...prev, deleteModal: false}))}/>
+        <Modal onClose={() => setState((prev) => ({ ...prev, deleteModal: false }))}>
+          <DeleteModal
+            handleDeleteUser={handleDeleteUser}
+            name={user?.name}
+            setDeleteModal={() => setState((prev) => ({ ...prev, deleteModal: false }))}
+          />
         </Modal>
       )}
     </>
@@ -218,15 +231,6 @@ const Tooltip = styled.div`
   div {
     padding: 0.5rem;
   }
-`;
-
-const ModalButton = styled.div<{ bgColor: string }>`
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  background: ${({ bgColor }) => bgColor};
-  color: white;
-  border-radius: 10px;
-  box-shadow: ${(p) => p.theme.shadow};
 `;
 
 export default UserCard;
