@@ -20,6 +20,7 @@ const StyledLabel = styled.span<{ $size: string; $weight: string }>`
   font-size: ${(p) => p.$size};
   font-weight: ${(p) => p.$weight};
   color: ${(p) => p.theme.font};
+  word-break: break-word;
 `;
 
 export default Label;

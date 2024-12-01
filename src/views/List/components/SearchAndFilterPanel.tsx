@@ -89,87 +89,104 @@ function SearchAndFilterPanel({
     }, 5000);
   };
 
-  const FilterCitySectionMemo = useMemo(() => (
-    <FilterSection>
-      <Label sx={{ marginBottom: '0.5rem' }}>City</Label>
-      <Divider />
-      {orgData.map((data) => (
-        <FilterOption key={`${data.id}${data.address.city}`}>
-          <Label size="0.7rem" weight="bold">{data.address.city}</Label>
-          <FilterCheckbox
-            onChange={(e) => handleFilterChange(e)}
-            checked={filterData.includes(data.address.city)}
-            type="checkbox"
-            value={data.address.city}
-          />
-        </FilterOption>
-      ))}
-    </FilterSection>
-  ), [orgData, filterData, handleFilterChange]);
+  const FilterCitySectionMemo = useMemo(
+    () => (
+      <FilterSection>
+        <Label sx={{ marginBottom: "0.5rem" }}>City</Label>
+        <Divider />
+        {orgData.map((data) => (
+          <FilterOption key={`${data.id}${data.address.city}`}>
+            <Label size="0.7rem" weight="bold">
+              {data.address.city}
+            </Label>
+            <FilterCheckbox
+              onChange={(e) => handleFilterChange(e)}
+              checked={filterData.includes(data.address.city)}
+              type="checkbox"
+              value={data.address.city}
+            />
+          </FilterOption>
+        ))}
+      </FilterSection>
+    ),
+    [orgData, filterData, handleFilterChange]
+  );
 
-  const FilterCompanySectionMemo = useMemo(() => (
-    <FilterSection>
-      <Label sx={{ marginBottom: '0.5rem' }}>City</Label>
-      <Divider />
-      {orgData.map((data) => (
-        <FilterOption key={`${data.id}${data.company.name}`}>
-          <Label size="0.7rem" weight="bold">{data.company.name}</Label>
-          <FilterCheckbox
-            onChange={(e) => handleFilterChange(e)}
-            checked={filterData.includes(data.company.name)}
-            type="checkbox"
-            value={data.company.name}
-          />
-        </FilterOption>
-      ))}
-    </FilterSection>
-  ), [orgData, filterData, handleFilterChange]);
+  const FilterCompanySectionMemo = useMemo(
+    () => (
+      <FilterSection>
+        <Label sx={{ marginBottom: "0.5rem" }}>Company</Label>
+        <Divider />
+        {orgData.map((data) => (
+          <FilterOption key={`${data.id}${data.company.name}`}>
+            <Label size="0.7rem" weight="bold">
+              {data.company.name}
+            </Label>
+            <FilterCheckbox
+              onChange={(e) => handleFilterChange(e)}
+              checked={filterData.includes(data.company.name)}
+              type="checkbox"
+              value={data.company.name}
+            />
+          </FilterOption>
+        ))}
+      </FilterSection>
+    ),
+    [orgData, filterData, handleFilterChange]
+  );
 
   return (
     <>
       <Container>
-        <SearchContainer>
-          <SearchInput
-            mode={mode}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search name, email or company"
-          />
-          <SearchButton>
-            <FontAwesomeIcon icon={faMagnifyingGlass} />
-          </SearchButton>
-        </SearchContainer>
-        <ItemsPerPageContainer>
-          <Label>Items per page</Label>
-          <ItemsSelect
-            mode={mode}
-            onChange={(e) => setShowItems(Number(e.target.value))}
-            id="rows"
-            value={showItems}
-          >
-            <Option value={2}>
-              2
-            </Option>
-            <Option value={5}>5</Option>
-            <Option value={10}>10</Option>
-          </ItemsSelect>
-        </ItemsPerPageContainer>
-        <FilterButton id="filter" onClick={() => setFilterOpen(!filterOpen)}>
-          <FontAwesomeIcon icon={faFilter} />
-          <Label sx={{ color: "white" }}>Filter</Label>
-          <DropdownContainer
-            onClick={(e) => e.stopPropagation()}
-            id="filter-con"
-            className={filterOpen ? "active" : ""}
-          >
-            {FilterCitySectionMemo}
-            {FilterCompanySectionMemo}
-          </DropdownContainer>
-        </FilterButton>
-        <AddUserButton onClick={() => setAddUserModal(true)}>
-          <FontAwesomeIcon icon={faPlus} />
-          <Label sx={{color: 'white'}}>New User</Label>
-        </AddUserButton>
+        <SearchContainerWrapper>
+          <SearchContainer>
+            <SearchInput
+              mode={mode}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search name, email or company"
+            />
+            <SearchButton>
+              <FontAwesomeIcon icon={faMagnifyingGlass} />
+            </SearchButton>
+          </SearchContainer>
+        </SearchContainerWrapper>
+        <ButtonWrapper>
+          <ItemsPerPageContainer>
+            <Label>Items per page</Label>
+            <ItemsSelect
+              mode={mode}
+              onChange={(e) => setShowItems(Number(e.target.value))}
+              id="rows"
+              value={showItems}
+            >
+              <Option value={2}>2</Option>
+              <Option value={5}>5</Option>
+              <Option value={10}>10</Option>
+            </ItemsSelect>
+          </ItemsPerPageContainer>
+          <FilterAndUserButtonWrapper>
+            <FilterButton
+              id="filter"
+              onClick={() => setFilterOpen(!filterOpen)}
+            >
+              <FontAwesomeIcon icon={faFilter} />
+              <Label sx={{ color: "white" }}>Filter</Label>
+              <DropdownContainer
+                onClick={(e) => e.stopPropagation()}
+                id="filter-con"
+                className={filterOpen ? "active" : ""}
+              >
+                {FilterCitySectionMemo}
+                {FilterCompanySectionMemo}
+              </DropdownContainer>
+            </FilterButton>
+            <AddUserButton onClick={() => setAddUserModal(true)}>
+              <FontAwesomeIcon icon={faPlus} />
+              <Label sx={{ color: "white" }}>New User</Label>
+            </AddUserButton>
+          </FilterAndUserButtonWrapper>
+        </ButtonWrapper>
       </Container>
       {addUserModal && (
         <Modal onClose={() => setAddUserModal(false)}>
@@ -362,26 +379,72 @@ export const Error = styled.span`
   display: block;
 `;
 
+const FilterAndUserButtonWrapper = styled.div`
+width: 100%;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: end;
+gap: 1rem;
+
+@media (min-width: 460px) {
+   width: fit-content;
+`;
+
+const ButtonWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 460px) {
+    flex-direction: row;
+  }
+`;
+
 const Container = styled.div`
   width: 100%;
-  min-height: 15%;
-  gap: 2.5rem;
+  height: auto;
+  gap: 1rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   box-sizing: border-box;
   padding: 0 2rem;
+
+  @media (min-width: 900px) {
+    flex-direction: row;
+    height: 15%;
+  }
+`;
+
+const SearchContainerWrapper = styled.div`
+  width: 100%;
+  height: 40px;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: end;
+
+  @media (min-width: 900px) {
+    width: fit-content;
+    margin-top: 0rem;
+  }
 `;
 
 const SearchContainer = styled.div`
-  width: 40%;
-  height: 40%;
+  width: 100%;
+  height: 100%;
   border-radius: 20px;
   display: flex;
   overflow: hidden;
+
+  @media (min-width: 425px) {
+    width: 400px;
+  }
 `;
 
 const SearchInput = styled.input<{ mode: string }>`
-  width: 92%;
+  width: 82%;
   height: 100%;
   border: none;
   color: ${(props) => (props.mode === "light" ? "black" : "white")};
@@ -392,23 +455,31 @@ const SearchInput = styled.input<{ mode: string }>`
   box-shadow: ${(p) => p.theme.shadowInset};
   border-bottom-left-radius: 20px;
   border-top-left-radius: 20px;
+
+  @media (min-width: 425px) {
+    width: 85%;
+  }
 `;
 
 const SearchButton = styled.div`
-  width: 8%;
+  width: 18%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: ${(p) => p.theme.blue};
   color: white;
+
+  @media (min-width: 425px) {
+    width: 15%;
+  }
 `;
 
 const ItemsPerPageContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  height: 35%;
+  height: 40px;
   margin-left: auto;
 `;
 
@@ -424,7 +495,7 @@ const ItemsSelect = styled.select<{ mode: string }>`
 `;
 
 const FilterButton = styled.div`
-  height: 35%;
+  height: 40px;
   gap: 0.5rem;
   padding: 0 0.7rem;
   position: relative;
@@ -439,7 +510,7 @@ const FilterButton = styled.div`
 `;
 
 const AddUserButton = styled.div`
-  height: 35%;
+  height: 40px;
   padding: 0 0.7rem;
   gap: 0.5rem;
   cursor: pointer;
@@ -452,8 +523,11 @@ const AddUserButton = styled.div`
 `;
 
 const DropdownContainer = styled.div`
-  width: 320px;
+  width: auto;
+  max-width: 320px;
   display: flex;
+  gap: 1rem;
+  flex-direction: column;
   justify-content: space-between;
   border-radius: 10px;
   padding: 1rem;
@@ -462,7 +536,7 @@ const DropdownContainer = styled.div`
   box-shadow: ${(p) => p.theme.shadow};
   position: absolute;
   top: 110%;
-  right: 0%;
+  right: -110%;
   opacity: 0;
   visibility: hidden;
   transform: scaleY(0);
@@ -500,8 +574,8 @@ const FilterCheckbox = styled.input`
 `;
 
 const Option = styled.option`
-background-color: ${(p) => p.theme.secondary};
-color: ${(p) => p.theme.font};
+  background-color: ${(p) => p.theme.secondary};
+  color: ${(p) => p.theme.font};
 `;
 
 export default SearchAndFilterPanel;

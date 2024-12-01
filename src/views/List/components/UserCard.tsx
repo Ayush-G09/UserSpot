@@ -42,9 +42,13 @@ function UserCard({ user }: Props) {
     const toolContainer = document.getElementById(`tool-container-${user.id}`);
 
     if (tooltipElement) {
-      tooltipElement.style.visibility = state.tooltipOpen ? "visible" : "hidden";
+      tooltipElement.style.visibility = state.tooltipOpen
+        ? "visible"
+        : "hidden";
       tooltipElement.style.opacity = state.tooltipOpen ? "1" : "0";
-      tooltipElement.style.transform = state.tooltipOpen ? "scaleY(1)" : "scaleY(0)";
+      tooltipElement.style.transform = state.tooltipOpen
+        ? "scaleY(1)"
+        : "scaleY(0)";
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -105,15 +109,33 @@ function UserCard({ user }: Props) {
               {user.phone}
             </Label>
           </div>
+          <TooltipActionWrapper>
+            <FontAwesomeIcon
+              onClick={() => navigate(`/user/${user.id}`)}
+              size="xs"
+              color="#0288d1"
+              icon={faArrowUpRightFromSquare}
+            />
+            <FontAwesomeIcon
+              onClick={() =>
+                setState((prev) => ({ ...prev, deleteModal: true }))
+              }
+              size="xs"
+              color="red"
+              icon={faTrash}
+            />
+          </TooltipActionWrapper>
         </UserDetails>
         <UserInfo>
-          <Label size="0.8rem">{user.email}</Label>
+          <WrapperLabel>Email</WrapperLabel>
+          <WrapperData>{user.email}</WrapperData>
         </UserInfo>
         <AddressWrapper>
           <Label>{`${user.address.street}, ${user.address.city}, ${user.address.zipcode}`}</Label>
         </AddressWrapper>
         <CompanyWrapper>
-          <Label>{user.company.name}</Label>
+          <WrapperLabel>Company</WrapperLabel>
+          <WrapperData>{user.company.name}</WrapperData>
         </CompanyWrapper>
         <ToolContainer
           id={`tool-container-${user.id}`}
@@ -138,7 +160,9 @@ function UserCard({ user }: Props) {
             </div>
             <div>
               <FontAwesomeIcon
-                onClick={() => setState((prev) => ({ ...prev, deleteModal: true }))}
+                onClick={() =>
+                  setState((prev) => ({ ...prev, deleteModal: true }))
+                }
                 size="xs"
                 color="red"
                 icon={faTrash}
@@ -148,11 +172,15 @@ function UserCard({ user }: Props) {
         </ToolContainer>
       </UserCardWrapper>
       {state.deleteModal && (
-        <Modal onClose={() => setState((prev) => ({ ...prev, deleteModal: false }))}>
+        <Modal
+          onClose={() => setState((prev) => ({ ...prev, deleteModal: false }))}
+        >
           <DeleteModal
             handleDeleteUser={handleDeleteUser}
             name={user?.name}
-            setDeleteModal={() => setState((prev) => ({ ...prev, deleteModal: false }))}
+            setDeleteModal={() =>
+              setState((prev) => ({ ...prev, deleteModal: false }))
+            }
           />
         </Modal>
       )}
@@ -160,14 +188,67 @@ function UserCard({ user }: Props) {
   );
 }
 
+const TooltipActionWrapper = styled.div`
+  && {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    gap: 1rem;
+    width: fit-content;
+
+    @media (min-width: 1100px) {
+      display: none;
+    }
+  }
+`;
+
+const WrapperLabel = styled.label`
+  color: ${(p) => p.theme.font};
+  font-size: 0.8rem;
+  color: gray;
+  margin-right: auto;
+
+  @media (min-width: 1100px) {
+    display: none;
+  }
+`;
+
+const WrapperData = styled.label`
+  color: ${(p) => p.theme.font};
+  font-size: 0.8rem;
+  word-break: break-word;
+
+  @media (min-width: 1100px) {
+    font-size: 1rem;
+  }
+`;
+
 const UserCardWrapper = styled.div`
-  width: 100%;
+  width: 96%;
   display: flex;
-  align-items: center;
+  align-items: start;
+  flex-direction: column;
+  border-radius: 10px;
+  box-shadow: ${(p) => p.theme.shadow};
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+  padding-bottom: 0.5rem;
+  box-sizing: border-box;
+
+  @media (min-width: 1100px) {
+    width: 100%;
+    align-items: center;
+    flex-direction: row;
+    box-shadow: none;
+    margin-bottom: 0;
+    padding: 0;
+    padding-bottom: 0;
+  }
 `;
 
 const UserDetails = styled.div`
-  width: 22%;
+  width: 100%;
   display: flex;
   padding: 0.6rem 0;
   gap: 0.5rem;
@@ -184,34 +265,56 @@ const UserDetails = styled.div`
     justify-content: center;
     flex-direction: column;
   }
+
+  @media (min-width: 1100px) {
+    width: 22%;
+  }
 `;
 
 const UserInfo = styled.div`
-  width: 23%;
+  width: 100%;
   gap: 0.5rem;
   display: flex;
+  align-items: center;
+
+  @media (min-width: 1100px) {
+    width: 23%;
+  }
 `;
 
 const AddressWrapper = styled.div`
   width: 34%;
   gap: 0.5rem;
-  display: flex;
+  display: none;
+
+  @media (min-width: 1100px) {
+    display: flex;
+  }
 `;
 
 const CompanyWrapper = styled.div`
-  width: 18%;
+  width: 100%;
   gap: 0.5rem;
   display: flex;
+  align-items: center;
+
+  @media (min-width: 1100px) {
+    width: 18%;
+  }
 `;
 
 const ToolContainer = styled.div<{ mode: string }>`
   width: 3%;
   position: relative;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   color: ${(p) => p.theme.font};
   cursor: pointer;
+
+  @media (min-width: 1100px) {
+    display: flex;
+  }
 `;
 
 const Tooltip = styled.div`

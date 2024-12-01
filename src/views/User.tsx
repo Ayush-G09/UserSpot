@@ -37,9 +37,9 @@ import Divider from "../components/Divider";
 type UserFormInputs = Omit<User, "id">;
 
 type State = {
-    deleteModal: boolean;
-    editUserModal: boolean;
-}
+  deleteModal: boolean;
+  editUserModal: boolean;
+};
 
 const generateRandomCoordinate = (min: number, max: number) => {
   return (Math.random() * (max - min) + min).toFixed(6);
@@ -121,7 +121,7 @@ function UserView() {
       id: user!.id,
     };
     dispatch(updateUser(newUser));
-    setState((prev) => ({...prev, editUserModal: false}))
+    setState((prev) => ({ ...prev, editUserModal: false }));
 
     const notification: NotificationCard = {
       msg: "User updated.",
@@ -157,24 +157,31 @@ function UserView() {
           </DetailRow>
           <ButtonGroup>
             <Button
-              onClick={() => setState((prev) => ({...prev, editUserModal: true}))}
+              onClick={() =>
+                setState((prev) => ({ ...prev, editUserModal: true }))
+              }
               style={{ backgroundColor: "#0288d1" }}
             >
               <FontAwesomeIcon icon={faPen} />
-              <Label sx={{color: 'white'}}>Edit</Label>
+              <Label sx={{ color: "white" }}>Edit</Label>
             </Button>
             <Button
-              onClick={() => setState((prev) => ({...prev, deleteModal: true}))}
+              onClick={() =>
+                setState((prev) => ({ ...prev, deleteModal: true }))
+              }
               style={{ backgroundColor: "red" }}
             >
               <FontAwesomeIcon icon={faTrash} />
-              <Label sx={{color: 'white'}}>Delete</Label>
+              <Label sx={{ color: "white" }}>Delete</Label>
             </Button>
           </ButtonGroup>
         </LeftSection>
         <RightSection>
           <Card>
-            <FontAwesomeIcon icon={faGlobe} color={mode === 'light' ? 'black' : 'white'} />
+            <FontAwesomeIcon
+              icon={faGlobe}
+              color={mode === "light" ? "black" : "white"}
+            />
             <Label>Website</Label>
             <Label sx={{ color: "gray", marginLeft: "auto" }}>
               {user?.website}
@@ -183,7 +190,10 @@ function UserView() {
 
           <Card flexDirection="column">
             <CardHeader>
-              <FontAwesomeIcon icon={faBriefcase} color={mode === 'light' ? 'black' : 'white'} />
+              <FontAwesomeIcon
+                icon={faBriefcase}
+                color={mode === "light" ? "black" : "white"}
+              />
               <Label>Company</Label>
             </CardHeader>
             <Divider />
@@ -209,7 +219,10 @@ function UserView() {
 
           <Card flexDirection="column">
             <CardDetailRow>
-              <FontAwesomeIcon icon={faLocationDot} color={mode === 'light' ? 'black' : 'white'} />
+              <FontAwesomeIcon
+                icon={faLocationDot}
+                color={mode === "light" ? "black" : "white"}
+              />
               <Label>Address</Label>
             </CardDetailRow>
             <Divider />
@@ -241,16 +254,24 @@ function UserView() {
         </RightSection>
       </StyledUserView>
       {state.deleteModal && (
-        <Modal onClose={() => setState((prev) => ({...prev, deleteModal: false}))}>
+        <Modal
+          onClose={() => setState((prev) => ({ ...prev, deleteModal: false }))}
+        >
           <DeleteModal
             handleDeleteUser={handleDeleteUser}
-            setDeleteModal={() => setState((prev) => ({...prev, deleteModal: false}))}
+            setDeleteModal={() =>
+              setState((prev) => ({ ...prev, deleteModal: false }))
+            }
             name={user?.name}
           />
         </Modal>
       )}
       {state.editUserModal && (
-        <Modal onClose={() => setState((prev) => ({...prev, editUserModal: false}))}>
+        <Modal
+          onClose={() =>
+            setState((prev) => ({ ...prev, editUserModal: false }))
+          }
+        >
           <Label>Edit User</Label>
           <FormContainer onSubmit={handleSubmit(onSubmit)}>
             <FormField>
@@ -373,44 +394,85 @@ const StyledUserView = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+
+  @media (min-width: 1100px) {
+    flex-direction: row;
+  }
 `;
 
 const LeftSection = styled.div`
-  width: 30%;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 2rem 0;
+
+  @media (min-width: 1100px) {
+    width: 30%;
+    margin: 0;
+  }
 `;
 
 const Avatar = styled.img`
   border-radius: 50%;
-  width: 15rem;
-  height: 15rem;
+  width: 10rem;
+  height: 10rem;
   box-shadow: ${(p) => p.theme.shadow};
+
+  @media (min-width: 425px) {
+    width: 15rem;
+    height: 15rem;
+  }
 `;
 
 const UserInfo = styled.div`
-  width: 70%;
+  width: 85%;
   display: flex;
   flex-direction: column;
   margin-top: 5rem;
+
+  @media (min-width: 425px) {
+    width: 50%;
+  }
+
+  @media (min-width: 1100px) {
+    width: 70%;
+  }
 `;
 
 const DetailRow = styled.div`
   display: flex;
-  width: 70%;
+  width: 85%;
   justify-content: space-between;
   margin-top: 1rem;
+
+  @media (min-width: 425px) {
+    width: 50%;
+  }
+
+  @media (min-width: 1100px) {
+    width: 70%;
+  }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  width: 70%;
+  width: 85%;
   justify-content: end;
   margin-top: 3rem;
   gap: 2rem;
+
+  @media (min-width: 425px) {
+    width: 50%;
+  }
+
+  @media (min-width: 1100px) {
+    width: 70%;
+  }
 `;
 
 const Button = styled.div`
@@ -426,24 +488,34 @@ const Button = styled.div`
 `;
 
 const RightSection = styled.div`
-  width: 70%;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 3rem;
+  margin: 2rem 0;
+
+  @media (min-width: 1100px) {
+    width: 70%;
+    margin: 0;
+  }
 `;
 
 const Card = styled.div<{ flexDirection?: string }>`
-  width: 50%;
+  width: 80%;
   padding: 1rem;
   border-radius: 10px;
   background-color: ${(p) => p.theme.secondary};
   gap: 1rem;
   display: flex;
   align-items: center;
-  flex-direction: ${(p) => (p.flexDirection ? p.flexDirection : "roe")};
+  flex-direction: ${(p) => (p.flexDirection ? p.flexDirection : "row")};
+
+  @media (min-width: 768px) {
+    width: 50%;
+  }
 `;
 
 const CardHeader = styled.div`

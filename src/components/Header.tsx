@@ -27,7 +27,7 @@ function Header() {
         <ToggleCircle onClick={toggleMode} mode={mode}>
           <FontAwesomeIcon icon={faMoon} />
         </ToggleCircle>
-        <ToggleCircle onClick={toggleMode} mode={mode} isSun>
+        <ToggleCircle onClick={toggleMode} mode={mode} $isSun>
           <FontAwesomeIcon icon={faSun} />
         </ToggleCircle>
       </ToggleSwitch>
@@ -63,12 +63,12 @@ const ToggleSwitch = styled.div`
   position: relative;
 `;
 
-const ToggleCircle = styled.div<{ mode: string; isSun?: boolean }>`
+const ToggleCircle = styled.div<{ mode: string; $isSun?: boolean }>`
   width: 25px;
   height: 25px;
   border-radius: 50%;
   background-color: ${(props) =>
-    props.isSun
+    props.$isSun
       ? props.mode === "light"
         ? "orange"
         : "transparent"
@@ -79,7 +79,7 @@ const ToggleCircle = styled.div<{ mode: string; isSun?: boolean }>`
   align-items: center;
   justify-content: center;
   color: ${(props) =>
-    props.isSun
+    props.$isSun
       ? props.mode === "light"
         ? "white"
         : "gray"
@@ -88,7 +88,14 @@ const ToggleCircle = styled.div<{ mode: string; isSun?: boolean }>`
       : "white"};
   cursor: pointer;
   position: absolute;
-  left: ${(props) => (props.isSun ? (props.mode === "light" ? "48px" : "2px") : props.mode === "light" ? "2px" : "48px")};
+  left: ${(props) =>
+    props.$isSun
+      ? props.mode === "light"
+        ? "48px"
+        : "2px"
+      : props.mode === "light"
+      ? "2px"
+      : "48px"};
   transition: 0.3s ease-in-out;
 `;
 

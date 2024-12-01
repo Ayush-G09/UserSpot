@@ -279,7 +279,7 @@ function List() {
         setFilterOpen={(e) => setState((prev) => ({ ...prev, filterOpen: e }))}
         filterOpen={state.filterOpen}
         handleFilterChange={handleFilterChange}
-        orgData={state.pageData}
+        orgData={state.users}
         filterData={state.filterData}
       />
       <ListContent>
@@ -385,19 +385,30 @@ const Container = styled.div`
 
 const ListContent = styled.div`
   width: 85%;
-  min-height: 76%;
+  height: -webkit-fill-available;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   padding-bottom: 50px;
+  padding-top: 10px;
   overflow-y: scroll;
+  align-items: center;
+  margin-top: 0.5rem;
+
+  @media (min-width: 900px) {
+    margin-top: 0;
+  }
 `;
 
 const Header = styled.div`
   width: 100%;
   padding: 0.5rem 0;
-  display: flex;
+  display: none;
   align-items: center;
+
+  @media (min-width: 1100px) {
+    display: flex;
+  }
 `;
 
 const HeaderItem = styled.div<{ width: string }>`
@@ -410,7 +421,7 @@ const HeaderItem = styled.div<{ width: string }>`
 
 const Footer = styled.div`
   width: 85%;
-  height: 9%;
+  min-height: 9%;
   display: flex;
   align-items: center;
   justify-content: end;
